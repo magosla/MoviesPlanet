@@ -13,12 +13,12 @@ import com.naijaplanet.magosla.android.moviesplanet.util.MovieDbUtil;
 public class VideosLoader extends AppLoader<VideosResult> {
     private static final String BUNDLE_MOVIE_ID_KEY = "movie_id_key";
 
-    public VideosLoader(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull LoaderCallback callback) {
+    public VideosLoader(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull AppLoaderCallback<VideosResult> callback) {
         super(context, loaderManager, callback);
     }
 
     @Override
-    Loader<VideosResult> createLoaderTask(Context context, int loaderId, @NonNull LoaderCallback callback, @Nullable Bundle args) {
+    Loader<VideosResult> createLoaderTask(Context context, int loaderId, @NonNull AppLoaderCallback<VideosResult> callback, @Nullable Bundle args) {
         return new VideosTask(context, callback, args);
     }
 
@@ -38,7 +38,7 @@ public class VideosLoader extends AppLoader<VideosResult> {
 
     private static class VideosTask extends AppAsyncTaskLoader<VideosResult> {
 
-        VideosTask(Context context, LoaderCallback<VideosResult> loaderCallback, @Nullable Bundle args) {
+        VideosTask(Context context, AppLoaderCallback<VideosResult> loaderCallback, @Nullable Bundle args) {
             super(context, loaderCallback, args);
         }
 

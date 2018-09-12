@@ -10,13 +10,12 @@ import com.naijaplanet.magosla.android.moviesplanet.R;
 import com.naijaplanet.magosla.android.moviesplanet.data.MoviesResult;
 import com.naijaplanet.magosla.android.moviesplanet.data.ReviewsResult;
 import com.naijaplanet.magosla.android.moviesplanet.data.VideosResult;
-import com.naijaplanet.magosla.android.moviesplanet.models.Video;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Locale;
 
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
@@ -110,12 +109,12 @@ public class MovieDbUtil {
      * @param movieId   the id of the movie
      * @return the url string
      */
-    public static String getMovieVideosUrl(int movieId) {
+    private static String getMovieVideosUrl(int movieId) {
         HttpUrl url = HttpUrl.parse(Config.MOVIEDB_BASE_URL);
         if(url != null) //noinspection DanglingJavadoc
         {
             HttpUrl.Builder urlBuilder = url.newBuilder();
-            urlBuilder.addPathSegments(String.format(Config.MOVIE_VIDEOS_URI_TEMPLATE,movieId));
+            urlBuilder.addPathSegments(String.format(Locale.getDefault(),Config.MOVIE_VIDEOS_URI_TEMPLATE,movieId));
 
             return urlBuilder.build().toString();
         }
@@ -129,12 +128,12 @@ public class MovieDbUtil {
      * @param page   the page number
      * @return the url string
      */
-    public static String getMovieReviewsUrl(int movieId, int page) {
+    private static String getMovieReviewsUrl(int movieId, int page) {
         HttpUrl url = HttpUrl.parse(Config.MOVIEDB_BASE_URL);
         if(url != null) //noinspection DanglingJavadoc
         {
             HttpUrl.Builder urlBuilder = url.newBuilder();
-            urlBuilder.addPathSegments(String.format(Config.MOVIE_REVIEW_URI_TEMPLATE, movieId));
+            urlBuilder.addPathSegments(String.format(Locale.getDefault(),Config.MOVIE_REVIEW_URI_TEMPLATE, movieId));
             urlBuilder.addQueryParameter("page", String.valueOf(((page < 1) ? 1 : page)));
 
             return urlBuilder.build().toString();
@@ -176,7 +175,8 @@ public class MovieDbUtil {
                     }
                     // TODO what to do when the response has no results field
                 } else {
-                    // TODO what to do when the response body is empty
+                    // what to do when the response body is empty
+                    performInternetCheck(callback, context);
                 }
 
             } catch (JSONException e) {
@@ -185,19 +185,23 @@ public class MovieDbUtil {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO action to perform if there is an IOException error
-            new InternetCheck(new InternetCheck.Consumer() {
-                @Override
-                public void accept(Boolean internet) {
-                    if(!internet){
-                        if(callback!= null) {
-                            callback.error(context.getString(R.string.message_no_network_connection));
-                        }
-                    }
-                }
-            });
+            performInternetCheck(callback, context);
+
         }
         return moviesResult;
+    }
+
+    private static void performInternetCheck(final Callback callback, final Context context){
+        new InternetCheck(new InternetCheck.Consumer() {
+            @Override
+            public void accept(Boolean internet) {
+                if(!internet){
+                    if(callback!= null) {
+                        callback.error(context.getString(R.string.message_no_network_connection));
+                    }
+                }
+            }
+        });
     }
 
     /**
@@ -294,17 +298,8 @@ public class MovieDbUtil {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            // TODO action to perform if there is an IOException error
-            new InternetCheck(new InternetCheck.Consumer() {
-                @Override
-                public void accept(Boolean internet) {
-                    if(!internet){
-                        if(callback!= null) {
-                            callback.error(context.getString(R.string.message_no_network_connection));
-                        }
-                    }
-                }
-            });
+            // action to perform if there is an IOException error
+            performInternetCheck(callback,context);
         }
         return videosResult;
     }

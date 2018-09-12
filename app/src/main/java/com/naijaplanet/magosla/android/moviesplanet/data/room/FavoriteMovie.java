@@ -6,7 +6,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
 @Entity(tableName = "favorite_movies")
-public class FavoriteMovies  {
+public class FavoriteMovie  {
     @PrimaryKey
     private int id;
 

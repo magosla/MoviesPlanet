@@ -7,19 +7,17 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ShareCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import com.android.databinding.library.baseAdapters.BR;
 import com.facebook.stetho.Stetho;
@@ -32,7 +30,6 @@ import com.naijaplanet.magosla.android.moviesplanet.fragments.VideosFragment;
 import com.naijaplanet.magosla.android.moviesplanet.models.Movie;
 import com.naijaplanet.magosla.android.moviesplanet.util.ActivityUtil;
 import com.naijaplanet.magosla.android.moviesplanet.util.MovieDbUtil;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -40,13 +37,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class DetailsActivity extends AppCompatActivity {
-    private ActivityDetailsBinding mActivityDetailsBinding;
     private static final String BUNDLE_FULL_PHOTO = "full_photo_open";
-    private boolean fullPhotoOpen;
     private static final String TAG_REVIEWS_FRAGMENT = "reviews";
     private static final String TAG_VIDEOS_FRAGMENT = "videos";
     private static final String TAG_FAVORITE_FRAGMENT = "favorite";
+    private ActivityDetailsBinding mActivityDetailsBinding;
+    private boolean fullPhotoOpen;
     private int mMovieId;
+    private Movie mMovie;
+
+    @SuppressWarnings("unused")
+    @BindingAdapter("android:text")
+    public static void setText(TextView view, Double value) {
+        view.setText(String.valueOf(value));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,28 +68,33 @@ public class DetailsActivity extends AppCompatActivity {
             return;
         }
         Bundle extras = intent.getExtras();
-        Movie movie = null;
+
         if (extras != null) {
-            movie = extras.getParcelable(Config.EXTRA_MOVIE_KEY);
-            mMovieId = movie.getId();
+            mMovie = extras.getParcelable(Config.EXTRA_MOVIE_KEY);
         }
-        if (movie == null) {
+        if (mMovie == null) {
             closeOnError();
             return;
         }
+        mMovieId = mMovie.getId();
 
         setSupportActionBar(mActivityDetailsBinding.toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            setTitle(movie.getTitle());
+            setTitle(mMovie.getTitle());
         }
 
-        mActivityDetailsBinding.setVariable(BR.movie, movie);
-        String photo_url = MovieDbUtil.getPhotoUrl(movie.getPosterPath(), Config.MOVIEDB_FULL_SIZE);
+        mActivityDetailsBinding.setVariable(BR.movie, mMovie);
+        String photo_url = MovieDbUtil.getPhotoUrl(mMovie.getPosterPath(), Config.MOVIEDB_FULL_SIZE);
         mActivityDetailsBinding.setVariable(BR.photo_url, photo_url);
-        mActivityDetailsBinding.ivFullPostal.setTag(movie.getId());
+        mActivityDetailsBinding.ivFullPostal.setTag(mMovie.getId());
 
         setupFullPostalView(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         setupFragments();
     }
 
@@ -127,7 +136,7 @@ public class DetailsActivity extends AppCompatActivity {
 
                         ShareCompat.IntentBuilder intentBuilder = ShareCompat.IntentBuilder.from(DetailsActivity.this);
                         intentBuilder.setType("image/*").setStream(bitmapUri);
-                        startActivity(Intent.createChooser(intentBuilder.getIntent(),getString(R.string.label_share_with)));
+                        startActivity(Intent.createChooser(intentBuilder.getIntent(), getString(R.string.label_share_with)));
                         return true;
 
                     } catch (FileNotFoundException e) {
@@ -185,13 +194,6 @@ public class DetailsActivity extends AppCompatActivity {
         Toast.makeText(this, R.string.message_movie_detail_error, Toast.LENGTH_SHORT).show();
     }
 
-
-    @SuppressWarnings("unused")
-    @BindingAdapter("android:text")
-    public static void setText(TextView view, Double value) {
-        view.setText(String.valueOf(value));
-    }
-
     private void setupFragments() {
         FragmentManager fm = getSupportFragmentManager();
         VideosFragment videosFragment = (VideosFragment) fm.findFragmentByTag(TAG_VIDEOS_FRAGMENT);
@@ -209,7 +211,8 @@ public class DetailsActivity extends AppCompatActivity {
                 ft.add(mActivityDetailsBinding.reviewsFragmentContainer.getId(), ReviewsFragment.newInstance(mMovieId), TAG_REVIEWS_FRAGMENT);
             }
             if (favoriteFragment == null) {
-                ft.add(favoriteFragment.newInstance(mMovieId), TAG_FAVORITE_FRAGMENT);
+
+                ft.add(mActivityDetailsBinding.favoriteFragmentContainer.getId(), FavoriteFragment.newInstance(mMovie), TAG_FAVORITE_FRAGMENT);
             }
 
             ft.commit();

@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.App"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
+        android:fullBackupContent="@xml/backup_descriptor">
         <activity
             android:name=".activities.MainActivity"
             android:launchMode="singleTop">

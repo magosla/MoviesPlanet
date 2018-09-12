@@ -7,11 +7,12 @@ import java.util.List;
  * An abstract class for the results of Models
  * @param <D> the data type
  */
+@SuppressWarnings("WeakerAccess")
 abstract public class Results<D> {
-    protected List<D> results;
-    protected int page;
-    protected int totalPages;
-    protected int totalResults;
+    private List<D> results;
+    private int page;
+    private int totalPages;
+    private int totalResults;
 
     public Results(){
         results = new ArrayList<>();

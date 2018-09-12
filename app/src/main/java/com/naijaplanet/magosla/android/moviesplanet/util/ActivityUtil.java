@@ -20,19 +20,21 @@ public class ActivityUtil {
     private static boolean mCalledTransitionEnable;
 
 
-    /**
-     * Launches an activity
-     * @param activity the current activity
-     * @param cls the Destination activity class
-     * @param extraBundles extra {@link Bundle} to send
-     */
-    public static void lunchActivity(Activity activity, Class<?> cls, @Nullable Bundle extraBundles){
-        Intent intent = new Intent(activity, cls);
-        if(extraBundles != null){
-            intent.putExtras(extraBundles);
-        }
-            activity.startActivity(intent);
-    }
+// --Commented out by Inspection START (09/09/2018 16:10):
+//    /**
+//     * Launches an activity
+//     * @param activity the current activity
+//     * @param cls the Destination activity class
+//     * @param extraBundles extra {@link Bundle} to send
+//     */
+//    public static void lunchActivity(Activity activity, Class<?> cls, @Nullable Bundle extraBundles){
+//        Intent intent = new Intent(activity, cls);
+//        if(extraBundles != null){
+//            intent.putExtras(extraBundles);
+//        }
+//            activity.startActivity(intent);
+//    }
+// --Commented out by Inspection STOP (09/09/2018 16:10)
     /**
      * Launches an activity with transitions
      * @param activity the current activity

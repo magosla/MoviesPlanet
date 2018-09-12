@@ -2,11 +2,9 @@ package com.naijaplanet.magosla.android.moviesplanet.data.room;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
 
 import java.util.List;
 
@@ -14,20 +12,18 @@ import java.util.List;
 @Dao
 public interface FavoriteMoviesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-     void addMovies(FavoriteMovies... movies);
+    void addMovies(FavoriteMovie... movies);
 
-    @Update
-    void updateMovies(FavoriteMovies... movies);
-
-    @Delete
-    void deleteMovies(FavoriteMovies... movies);
+    @Query("DELETE FROM favorite_movies WHERE id= :movieId")
+    void deleteMovieById(int movieId);
 
     @Query("SELECT * FROM favorite_movies")
-    List<FavoriteMovies> findAll();
+    LiveData<List<FavoriteMovie>> findAll();
 
+    @SuppressWarnings("unused")
     @Query("SELECT * FROM favorite_movies LIMIT :offset, :length")
-    List<FavoriteMovies> findWithLimits(int offset, int length);
+    LiveData<List<FavoriteMovie>> findWithLimits(int offset, int length);
 
     @Query("SELECT id FROM favorite_movies WHERE id = :movieId LIMIT 1")
-     LiveData<Favorite> isFavorite(int movieId);
+     LiveData<FavoriteId> isFavorite(int movieId);
 }

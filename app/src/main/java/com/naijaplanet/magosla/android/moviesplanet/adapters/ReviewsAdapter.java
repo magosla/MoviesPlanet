@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.naijaplanet.magosla.android.moviesplanet.data.ReviewsResult;
 import com.naijaplanet.magosla.android.moviesplanet.models.Review;
 import com.naijaplanet.magosla.android.moviesplanet.models.ReviewsRecord;
 

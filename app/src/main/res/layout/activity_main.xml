@@ -1,33 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         tools:context=".activities.MainActivity">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_movie_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/action_reload"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/fl_settings_holder"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:background="@color/window_background"></FrameLayout>
+            android:background="@color/window_background"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+
+            app:layout_constraintTop_toTopOf="@+id/rv_movie_list" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:id="@+id/tv_no_item"
+            android:layout_height="wrap_content"
+            android:text="@string/msg_no_movie"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/action_reload"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/color_black"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/msg_encountered_error" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:drawableLeft="@android:drawable/stat_notify_sync_noanim"
+                android:drawableStart="@android:drawable/stat_notify_sync_noanim"
+                android:gravity="center"
+                android:text="@string/reload_label" />
+        </LinearLayout>
 
         <ProgressBar
             android:id="@+id/pb_loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:src="@mipmap/ic_launcher"
-            android:text="Loading..."
-            android:visibility="gone" />
-    </FrameLayout>
+            android:layout_marginBottom="10dp"
+            android:text="@string/loading_indication_label"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+    </android.support.constraint.ConstraintLayout>
 </layout>

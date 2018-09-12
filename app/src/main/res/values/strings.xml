@@ -14,23 +14,23 @@
     <string name="pref_filter_popular_label">Popular</string>
     <string name="pref_filter_top_rated_label">Top Rated</string>
     <string name="pref_filter_upcoming_label">Upcoming</string>
+    <string name="pref_filter_favorite_label">Favorite</string>
     <string name="pref_filter_now_playing_value" translatable="false">now_playing</string>
     <string name="pref_filter_popular_value" translatable="false">popular</string>
     <string name="pref_filter_top_rated_value" translatable="false">top_rated</string>
     <string name="pref_filter_upcoming_value" translatable="false">upcoming</string>
+    <string name="pref_filter_favorite_value" translatable="false">favorite</string>
 
     <string name="message_movie_detail_error">Error getting movie</string>
 
-    <string name="text_movie_ratings">%.1f/10</string>
-    <string name="title_movies">%s Movies</string>
-    <string name="postal_img_description">%s Postal</string>
+    <string name="text_movie_ratings" formatted="true">%.1f/10</string>
+    <string name="title_movies" formatted="true">%s Movies</string>
+    <string name="postal_img_description" formatted="true">%s Postal</string>
     <string name="message_no_network_connection">No Connection available</string>
     <string name="label_overview">Overview</string>
     <string name="label_rating">Rating</string>
     <string name="label_release_date">Release date</string>
     <string name="label_original_title">Original title</string>
-    <string name="label_close">close</string>
-    <string name="desc_close_photo">close photo</string>
     <string name="label_related_videos">Related Videos</string>
     <string name="label_reviews">Reviews</string>
     <string name="label_share">Share</string>
@@ -38,16 +38,21 @@
     <string name="label_movie_postal">Movie Postal</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="msg_no_review">No review</string>
-    <string name="msg_loading">Loading...</string>
+    <string name="msg_loading">Loading…</string>
     <string name="msg_no_video">No video</string>
     <string name="msg_video_thumbnail">video thumbnail</string>
     <string name="msg_play_video">play video</string>
-    <string name="watch_type">Watch %s</string>
+    <string name="watch_type" formatted="true">Watch %s</string>
 
     <!-- Used to identity actions tags -->
-    <string name="action">action</string>
-    <string name="action_play">play</string>
-    <string name="action_share">share</string>
+    <string name="action" translatable="false">action</string>
+    <string name="action_play" translatable="false">play</string>
+    <string name="action_share" translatable="false">share</string>
+    <string name="label_favorite">Favorite</string>
+    <string name="loading_indication_label">Loading…</string>
+    <string name="icon_label">icon</string>
+    <string name="msg_no_movie">No movie to display</string>
+    <string name="msg_encountered_error">An error was encountered</string>
+    <string name="reload_label">Tap to retry</string>
 </resources>

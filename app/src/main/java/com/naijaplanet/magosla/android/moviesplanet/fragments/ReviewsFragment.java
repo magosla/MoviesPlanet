@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,19 +14,19 @@ import android.view.ViewGroup;
 import com.naijaplanet.magosla.android.moviesplanet.adapters.ReviewsAdapter;
 import com.naijaplanet.magosla.android.moviesplanet.data.ReviewsResult;
 import com.naijaplanet.magosla.android.moviesplanet.databinding.FragmentReviewsBinding;
+import com.naijaplanet.magosla.android.moviesplanet.loaders.AppLoader;
 import com.naijaplanet.magosla.android.moviesplanet.loaders.ReviewsLoader;
-import com.naijaplanet.magosla.android.moviesplanet.models.Review;
-import com.naijaplanet.magosla.android.moviesplanet.models.ReviewsRecord;
 
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
 
+@SuppressWarnings("ConstantConditions")
 public class ReviewsFragment extends Fragment {
+    private static final String BUNDLE_MOVIE_ID = "movie_id";
     private ReviewsLoader mReviewsLoader;
     private ReviewsAdapter mReviewsAdapter;
     //private ReviewsRecord mReviewsRecord;
     private FragmentReviewsBinding mBinding;
     private int mMovieId;
-    private static final String BUNDLE_MOVIE_ID = "movie_id";
 
     public static ReviewsFragment newInstance(int movieId) {
         ReviewsFragment f = new ReviewsFragment();
@@ -43,11 +42,11 @@ public class ReviewsFragment extends Fragment {
         setRetainInstance(true);
 
         Bundle arg = getArguments();
-        mMovieId = arg.getInt(BUNDLE_MOVIE_ID, 0);
+        mMovieId = arg != null ? arg.getInt(BUNDLE_MOVIE_ID, 0) : 0;
 
         mReviewsAdapter = new ReviewsAdapter(getContext());
 
-        mReviewsLoader = new ReviewsLoader(getContext(), getActivity().getSupportLoaderManager(), new ReviewsLoader.LoaderCallback<ReviewsResult>() {
+        mReviewsLoader = new ReviewsLoader(getContext(), getActivity().getSupportLoaderManager(), new AppLoader.AppLoaderCallback<ReviewsResult>() {
             @Override
             public void loadingItems() {
                 mBinding.tvLoading.setVisibility(View.VISIBLE);
@@ -59,7 +58,7 @@ public class ReviewsFragment extends Fragment {
                     mReviewsAdapter.updateItems(result.getResults());
                 }
 
-                if(result != null && result.getResults().isEmpty() && mReviewsAdapter.getItemsRecord().isEmpty()){
+                if (result != null && result.getResults().isEmpty() && mReviewsAdapter.getItemsRecord().isEmpty()) {
                     mBinding.tvNoReview.setVisibility(View.VISIBLE);
                 }
                 mBinding.tvLoading.setVisibility(View.GONE);
@@ -98,6 +97,7 @@ public class ReviewsFragment extends Fragment {
         return mBinding.getRoot();
     }
 
+    @SuppressWarnings("SameParameterValue")
     private void loadReviews(int page) {
         mReviewsLoader.load(mMovieId, page < 1 ? 1 : page);
     }

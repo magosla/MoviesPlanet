@@ -11,6 +11,7 @@ import android.support.v4.content.Loader;
 import com.naijaplanet.magosla.android.moviesplanet.data.MoviesResult;
 import com.naijaplanet.magosla.android.moviesplanet.util.MovieDbUtil;
 
+@SuppressWarnings("ALL")
 public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult> {
     private static final String BUNDLE_FILTER_KEY = "filter";
     private static final String BUNDLE_PAGE_KEY = "page";
@@ -76,7 +77,7 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
         /**
          * when the movie list is about to the loaded
          */
-        void loadingMovies();
+        void loadingItems();
 
         /**
          * When the loading of the movie list is completed
@@ -115,7 +116,7 @@ public class MoviesLoader implements LoaderManager.LoaderCallbacks<MoviesResult>
             }
             if (takeContentChanged()) {
                 forceLoad();
-                mMovieLoaderCallback.loadingMovies();
+                mMovieLoaderCallback.loadingItems();
             }
         }
 

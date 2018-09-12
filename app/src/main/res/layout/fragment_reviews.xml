@@ -7,19 +7,19 @@
             android:id="@+id/rv_movie_reviews"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp"></android.support.v7.widget.RecyclerView>
+            android:padding="8dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tv_loading"
-            android:layout_gravity="top|left"
+            android:layout_gravity="top|start"
             android:layout_margin="10dp"
             android:textStyle="italic"
             android:visibility="gone"
             android:text="@string/msg_loading"/>
         <TextView
             android:id="@+id/tv_no_review"
-            android:layout_gravity="top|left"
+            android:layout_gravity="top|start"
             android:layout_margin="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

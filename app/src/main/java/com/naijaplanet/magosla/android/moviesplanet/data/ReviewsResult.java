@@ -16,6 +16,7 @@ public class ReviewsResult extends Results<Review>{
         return movieId;
     }
 
+    @SuppressWarnings("WeakerAccess")
     public void setMovieId(int movieId) {
         this.movieId = movieId;
     }

@@ -19,7 +19,7 @@ public class ReviewsViewHolder extends RecyclerView.ViewHolder{
 
     }
 
-    public ReviewsViewHolder(ViewDataBinding dataBinding) {
+    private ReviewsViewHolder(ViewDataBinding dataBinding) {
         super(dataBinding.getRoot());
         mBinding = dataBinding;
     }

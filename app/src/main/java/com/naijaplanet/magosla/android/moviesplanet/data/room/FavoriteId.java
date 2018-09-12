@@ -1,7 +1,8 @@
 package com.naijaplanet.magosla.android.moviesplanet.data.room;
 
 
-public class Favorite {
+@SuppressWarnings("unused")
+public class FavoriteId {
     private int id;
 
     public int getId() {
@@ -12,6 +13,6 @@ public class Favorite {
         this.id = id;
     }
 
-    public Favorite() {
+    public FavoriteId() {
     }
 }

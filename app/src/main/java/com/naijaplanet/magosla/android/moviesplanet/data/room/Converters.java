@@ -2,6 +2,7 @@ package com.naijaplanet.magosla.android.moviesplanet.data.room;
 
 import android.arch.persistence.room.TypeConverter;
 
+@SuppressWarnings("WeakerAccess")
 public class Converters {
     @TypeConverter
     public static int boolToInt(boolean value){
@@ -10,6 +11,6 @@ public class Converters {
 
     @TypeConverter
     public static boolean intToBoolean(int value){
-        return value > 0 ? true : false;
+        return value > 0;
     }
 }

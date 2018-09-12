@@ -8,8 +8,10 @@ import org.json.JSONObject;
 
 import java.util.Arrays;
 
+@SuppressWarnings({"WeakerAccess", "FieldCanBeLocal"})
 public class VideosResult extends Results<Video>{
     private int movieId;
+
 
     public int getMovieId() {
         return movieId;

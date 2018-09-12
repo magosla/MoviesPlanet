@@ -23,7 +23,7 @@ public class ReviewsRecord implements Parcelable{
     private int mPagesAvailable;
     private int mTotalReviewsAvailable;
     private int mTotalReviewsFetched;
-    private List<Review> mReviews;
+    private final List<Review> mReviews;
 
     public ReviewsRecord() {
         mReviews = new ArrayList<>();
@@ -39,13 +39,15 @@ public class ReviewsRecord implements Parcelable{
         in.readTypedList(mReviews, Review.CREATOR);
     }
 
-    private void reset() {
-        mCurrentPage = 0;
-        mPagesAvailable = 0;
-        mTotalReviewsAvailable = 0;
-        mTotalReviewsFetched = 0;
-        mReviews = new ArrayList<>();
-    }
+// --Commented out by Inspection START (09/09/2018 16:12):
+//    private void reset() {
+//        mCurrentPage = 0;
+//        mPagesAvailable = 0;
+//        mTotalReviewsAvailable = 0;
+//        mTotalReviewsFetched = 0;
+//        mReviews = new ArrayList<>();
+//    }
+// --Commented out by Inspection STOP (09/09/2018 16:12)
 
     /**
      * Return a {{@link Review}} from the list
@@ -69,6 +71,7 @@ public class ReviewsRecord implements Parcelable{
         return mCurrentPage;
     }
 
+    @SuppressWarnings("unused")
     public void setCurrentPage(int v) {
         mCurrentPage = v;
     }
@@ -78,18 +81,22 @@ public class ReviewsRecord implements Parcelable{
      *
      * @return total pages available on the server
      */
+    @SuppressWarnings("unused")
     public int getPagesAvailable() {
         return mPagesAvailable;
     }
 
+    @SuppressWarnings("unused")
     public void setPagesAvailable(int mPagesAvailable) {
         this.mPagesAvailable = mPagesAvailable;
     }
 
+    @SuppressWarnings("unused")
     public int getTotalReviewsAvailable() {
         return mTotalReviewsAvailable;
     }
 
+    @SuppressWarnings("unused")
     public void setTotalReviewsAvailable(int mTotalReviewsAvailable) {
         this.mTotalReviewsAvailable = mTotalReviewsAvailable;
     }
@@ -98,10 +105,12 @@ public class ReviewsRecord implements Parcelable{
         return mTotalReviewsFetched;
     }
 
+    @SuppressWarnings("unused")
     public void setTotalReviewsFetched(int mTotalReviewsFetched) {
         this.mTotalReviewsFetched = mTotalReviewsFetched;
     }
 
+    @SuppressWarnings("unused")
     public void addReviews(ReviewsResult reviewsResult) {
         if ((!reviewsResult.getResults().isEmpty()) &&
                 // this below expression prevent duplicate addition

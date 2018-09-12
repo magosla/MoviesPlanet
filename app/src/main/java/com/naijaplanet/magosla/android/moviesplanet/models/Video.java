@@ -9,6 +9,7 @@ public class Video {
     private String type;
     private int size;
 
+    @SuppressWarnings("unused")
     public String getId() {
         return id;
     }
@@ -33,6 +34,7 @@ public class Video {
         this.name = name;
     }
 
+    @SuppressWarnings("unused")
     public String getSite() {
         return site;
     }
@@ -49,6 +51,7 @@ public class Video {
         this.type = type;
     }
 
+    @SuppressWarnings("unused")
     public int getSize() {
         return size;
     }

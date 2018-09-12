@@ -11,5 +11,7 @@ public class Config {
     public static final String YOUTUBE_THUMBNAIL_URL_FORMAT = "https://i.ytimg.com/vi/%s/hqdefault.jpg";
     public static final String YOUTUBE_VIDEO_URL_FORMAT = "http://youtu.be/%s";
 
+    public static final String DATABASE_NAME = "movies_planet";
+
 
 }

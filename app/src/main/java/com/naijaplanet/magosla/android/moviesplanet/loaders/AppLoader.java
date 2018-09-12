@@ -9,13 +9,14 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 
 
+@SuppressWarnings({"WeakerAccess", "unused", "unchecked"})
 abstract public class AppLoader<D>  implements LoaderManager.LoaderCallbacks<D> {
     private final Context mContext;
     private final LoaderManager mLoaderManager;
-    private final LoaderCallback mCallback;
+    private final AppLoaderCallback mCallback;
 
 
-    public AppLoader(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull LoaderCallback<D> callback) {
+    public AppLoader(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull AppLoaderCallback<D> callback) {
         mContext = context;
         mLoaderManager = loaderManager;
         mCallback = callback;
@@ -34,7 +35,7 @@ abstract public class AppLoader<D>  implements LoaderManager.LoaderCallbacks<D> 
     }
 
 
-    public interface LoaderCallback<D> {
+    public interface AppLoaderCallback<D> {
         /**
          * when the data is about to the loaded
          */
@@ -59,15 +60,15 @@ abstract public class AppLoader<D>  implements LoaderManager.LoaderCallbacks<D> 
      * Creates an instance of the loader for example {@link AsyncTaskLoader<D>}
      * @param context the application {@link Context}
      * @param loaderId the loader id
-     * @param callback the {@link LoaderCallback<D>}
+     * @param callback the {@link AppLoaderCallback <D>}
      * @param args the argument {@link Bundle}
      * @return the loader
      */
-    abstract Loader<D> createLoaderTask(Context context, int loaderId, @NonNull LoaderCallback<D> callback, @Nullable Bundle args);
+    abstract Loader<D> createLoaderTask(Context context, int loaderId, @NonNull AppLoaderCallback<D> callback, @Nullable Bundle args);
 
     @NonNull
     @Override
-    public Loader<D> onCreateLoader(int id, @Nullable Bundle args) {
+    public Loader onCreateLoader(int id, @Nullable Bundle args) {
         // return a new loader task
         return createLoaderTask(mContext, id, mCallback, args);
 

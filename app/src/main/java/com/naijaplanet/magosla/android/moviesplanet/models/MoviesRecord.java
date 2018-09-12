@@ -29,7 +29,7 @@ public class MoviesRecord implements Parcelable {
 
     public MoviesRecord() {
         mMovies = new ArrayList<>();
-       // mMovieDbFilter="";
+        // mMovieDbFilter="";
     }
 
     private MoviesRecord(Parcel in) {
@@ -43,7 +43,7 @@ public class MoviesRecord implements Parcelable {
         in.readTypedList(mMovies, Movie.CREATOR);
     }
 
-    private void reset() {
+    public void reset() {
         mCurrentPage = 0;
         mPagesAvailable = 0;
         mTotalMoviesAvailable = 0;
@@ -115,24 +115,42 @@ public class MoviesRecord implements Parcelable {
         this.mMovieDbFilter = movieDbFilter;
     }
 
-    public void addMovies(MoviesResult moviesResult) {
-        boolean filterChanged = mMovieDbFilter!= null && !mMovieDbFilter.equals(moviesResult.getResultFilter());
-        if (filterChanged) {
+    public void addMovies(MoviesResult moviesResult){
+        addMovies(moviesResult, false);
+    }
+
+    public void addMovies(MoviesResult moviesResult, boolean forceReset) {
+        boolean filterChanged = mMovieDbFilter != null && !mMovieDbFilter.equals(moviesResult.getResultFilter());
+        if (filterChanged || forceReset) {
             // we are using a different filter, so empty any previous data
             reset();
         }
-        if ((!moviesResult.getResults().isEmpty() || filterChanged) &&
+        if (forceReset || ((!moviesResult.getResults().isEmpty() || filterChanged) &&
                 // this below expression prevent duplicate addition
-                !(mCurrentPage == moviesResult.getPage() && mMovieDbFilter.equals(moviesResult.getResultFilter()))
-                ) {
+                !(mCurrentPage == moviesResult.getPage() && moviesResult.getResultFilter().equals(mMovieDbFilter))
+        )) {
 
-            mMovies.addAll(moviesResult.getResults());
-            mTotalMoviesFetched = mMovies.size();
-            mMovieDbFilter = moviesResult.getResultFilter();
-            mTotalMoviesAvailable = moviesResult.getTotalResults();
-            mPagesAvailable = moviesResult.getTotalPages();
-            mCurrentPage = moviesResult.getPage();
+            add(moviesResult);
         }
+    }
+
+    private void add(MoviesResult moviesResult) {
+        mMovies.addAll(moviesResult.getResults());
+        mTotalMoviesFetched = mMovies.size();
+        mMovieDbFilter = moviesResult.getResultFilter();
+        mTotalMoviesAvailable = moviesResult.getTotalResults();
+        mPagesAvailable = moviesResult.getTotalPages();
+        mCurrentPage = moviesResult.getPage();
+    }
+
+    /**
+     * Set the movie in the movies record. this deletes any previous record
+     *
+     * @param moviesResult a {@link MoviesResult} instance
+     */
+    public void setMovies(MoviesResult moviesResult) {
+        reset();
+        add(moviesResult);
     }
 
     /**

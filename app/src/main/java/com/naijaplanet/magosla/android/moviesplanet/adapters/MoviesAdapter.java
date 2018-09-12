@@ -19,7 +19,7 @@ import com.squareup.picasso.Picasso;
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesViewHolder> {
     @SuppressWarnings({"FieldCanBeLocal", "CanBeFinal"})
     private final Context mContext;
-    private final MoviesRecord mMoviesRecord;
+    private MoviesRecord mMoviesRecord;
     private final OnEventListener mEventListener;
 
 
@@ -27,10 +27,15 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesViewHolder> {
         void onItemClick(Movie item);
     }
 
-    public MoviesAdapter(Context context, MoviesRecord moviesRecord, OnEventListener eventListener) {
+    public MoviesAdapter(Context context, OnEventListener eventListener) {
         mContext = context;
-        mMoviesRecord = moviesRecord;
+        mMoviesRecord = new MoviesRecord();
         mEventListener=eventListener;
+    }
+
+    public void setMoviesRecord(MoviesRecord moviesRecord){
+        mMoviesRecord=moviesRecord;
+        notifyDataSetChanged();
     }
 
     public MoviesRecord getMoviesRecord() {

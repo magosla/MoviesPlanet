@@ -30,7 +30,8 @@ class InternetCheck extends AsyncTask<Void,Void,Boolean> {
         sock.connect(new InetSocketAddress(hostName, hostPort), timeout);
         sock.close();
         return true;
-    } catch (IOException e) { return false; } }
+    } catch (IOException e) {
+        return false; } }
 
     @Override protected void onPostExecute(Boolean internet) { mConsumer.accept(internet); }
 

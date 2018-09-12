@@ -44,7 +44,7 @@ public class VideosAdapter extends RecyclerView.Adapter<VideosViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull VideosViewHolder holder, int position) {
-            holder.bind(mVideos.get(position));
+            holder.bind(mVideos.get(position), position);
     }
 
     @Override

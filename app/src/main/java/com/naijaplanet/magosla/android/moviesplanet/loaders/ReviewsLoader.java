@@ -14,12 +14,12 @@ public class ReviewsLoader extends AppLoader<ReviewsResult> {
     private static final String BUNDLE_PAGE_KEY = "page_key";
     private static final String BUNDLE_MOVIE_ID_KEY = "movie_id_key";
 
-    public ReviewsLoader(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull LoaderCallback<ReviewsResult> callback) {
+    public ReviewsLoader(@NonNull Context context, @NonNull LoaderManager loaderManager, @NonNull AppLoaderCallback<ReviewsResult> callback) {
         super(context, loaderManager, callback);
     }
 
     @Override
-    Loader<ReviewsResult> createLoaderTask(Context context, int loaderId, @NonNull LoaderCallback<ReviewsResult> callback, @Nullable Bundle args) {
+    Loader<ReviewsResult> createLoaderTask(Context context, int loaderId, @NonNull AppLoaderCallback<ReviewsResult> callback, @Nullable Bundle args) {
            return new ReviewsTask(context, callback, args);
     }
 
@@ -41,7 +41,7 @@ public class ReviewsLoader extends AppLoader<ReviewsResult> {
 
     private static class ReviewsTask extends AppAsyncTaskLoader<ReviewsResult>{
 
-        ReviewsTask(Context context, LoaderCallback<ReviewsResult> loaderCallback,@Nullable Bundle args) {
+        ReviewsTask(Context context, AppLoaderCallback<ReviewsResult> loaderCallback, @Nullable Bundle args) {
             super(context, loaderCallback, args);
         }
 

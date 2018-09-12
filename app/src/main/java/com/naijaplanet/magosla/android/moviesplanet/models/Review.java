@@ -23,13 +23,14 @@ public class Review implements Parcelable {
     public Review() {
     }
 
-    public Review(Parcel in) {
+    private Review(Parcel in) {
         id = in.readString();
         author = in.readString();
         content = in.readString();
         url = in.readString();
     }
 
+    @SuppressWarnings("unused")
     public String getId() {
         return id;
     }
@@ -54,10 +55,12 @@ public class Review implements Parcelable {
         this.content = content;
     }
 
+    @SuppressWarnings("unused")
     public String getUrl() {
         return url;
     }
 
+    @SuppressWarnings("unused")
     public void setUrl(String url) {
         this.url = url;
     }

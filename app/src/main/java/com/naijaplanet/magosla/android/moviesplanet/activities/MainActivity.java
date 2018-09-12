@@ -1,27 +1,26 @@
 package com.naijaplanet.magosla.android.moviesplanet.activities;
 
-import android.content.Intent;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.GridLayoutManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.facebook.stetho.Stetho;
 import com.naijaplanet.magosla.android.moviesplanet.Config;
 import com.naijaplanet.magosla.android.moviesplanet.EndlessRecyclerOnScrollListener;
 import com.naijaplanet.magosla.android.moviesplanet.R;
 import com.naijaplanet.magosla.android.moviesplanet.adapters.MoviesAdapter;
-import com.naijaplanet.magosla.android.moviesplanet.loaders.MoviesLoader;
-import com.naijaplanet.magosla.android.moviesplanet.data.MoviesResult;
 import com.naijaplanet.magosla.android.moviesplanet.databinding.ActivityMainBinding;
 import com.naijaplanet.magosla.android.moviesplanet.fragments.SettingsFragment;
 import com.naijaplanet.magosla.android.moviesplanet.models.Movie;
@@ -29,26 +28,16 @@ import com.naijaplanet.magosla.android.moviesplanet.models.MoviesRecord;
 import com.naijaplanet.magosla.android.moviesplanet.util.ActivityUtil;
 import com.naijaplanet.magosla.android.moviesplanet.util.GridItemSpacingDecoration;
 import com.naijaplanet.magosla.android.moviesplanet.util.GridItemsSpanSpacing;
+import com.naijaplanet.magosla.android.moviesplanet.viewmodels.MoviesViewModel;
 
 
 public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener, MoviesAdapter.OnEventListener {
-    private static final String BUNDLE_MOVIE_RECORD = "MOVIES_SAVE_KEY";
-    private static final String BUNDLE_FILTER_SETTING_STATE = "filter_setting_state";
-    private MoviesRecord mMoviesRecord;
-    private MoviesLoader mMoviesLoader;
+    private MoviesAdapter mMoviesAdapter;
     private ActivityMainBinding mActivityMainBinding;
-    private boolean movieFilterSettingActive;
     private EndlessRecyclerOnScrollListener mEndlessRecyclerOnScrollListener;
-    private int mSettingsFragmentComitId;
-
-    private Toast mToast;
-
+    private MoviesViewModel mMoviesViewModel;
+    private int mSettingsFragmentCommitId;
     private boolean mMoviesLoading; // to keep track of when movie loading is in process
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,27 +49,61 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         // register the sharedpreference change listener
         PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
 
+        setupView();
 
-        checkForSavedMoviesInstance(savedInstanceState);
-
-        setupView(savedInstanceState);
-
-        if (mMoviesRecord.isEmpty()) {
+        if (!mMoviesViewModel.hasRecord()) {
             loadMovies(1, null);
         }
     }
 
-    private void setupView(Bundle savedInstanceState) {
-        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+    private void initializeViewModel() {
+        mMoviesViewModel = ViewModelProviders.of(this).get(MoviesViewModel.class);
+        mMoviesViewModel.isLoading().observe(this, new Observer<Boolean>() {
+            @Override
+            public void onChanged(@Nullable Boolean loading) {
+                //noinspection ConstantConditions
+                mMoviesLoading = loading;
+                if (loading)
+                    removePlaceHolders();
+                mActivityMainBinding.pbLoading.setVisibility(loading ? View.VISIBLE : View.GONE);
+            }
+        });
+        mMoviesViewModel.getErrors().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                // showMessage(s);
+                if (mMoviesViewModel.hadFetchError()) {
+                    mActivityMainBinding.actionReload.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
-        checkForFilterOpenState(savedInstanceState);
+        mMoviesViewModel.getMoviesRecord().observe(this, new Observer<MoviesRecord>() {
+            @Override
+            public void onChanged(@Nullable MoviesRecord moviesRecord) {
+                Log.d(this.getClass().getSimpleName(), "Items found is null: " + String.valueOf(moviesRecord == null));
+                mMoviesAdapter.setMoviesRecord(moviesRecord);
+                if ((moviesRecord == null || moviesRecord.isEmpty())&& !mMoviesLoading)
+                    mActivityMainBinding.tvNoItem.setVisibility(View.VISIBLE);
+
+            }
+        });
+    }
+
+    private void removePlaceHolders() {
+        mActivityMainBinding.tvNoItem.setVisibility(View.GONE);
+        mActivityMainBinding.actionReload.setVisibility(View.GONE);
+    }
+
+    private void setupView() {
+        mActivityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 1);
         layoutManager.setSmoothScrollbarEnabled(true);
 
-        final MoviesAdapter moviesAdapter = new MoviesAdapter(this, mMoviesRecord, this);
+        mMoviesAdapter = new MoviesAdapter(this, this);
         mActivityMainBinding.rvMovieList.setLayoutManager(layoutManager);
-        mActivityMainBinding.rvMovieList.setAdapter(moviesAdapter);
+        mActivityMainBinding.rvMovieList.setAdapter(mMoviesAdapter);
 
         GridItemsSpanSpacing gridItemsSpanSpacing = new GridItemsSpanSpacing(mActivityMainBinding.rvMovieList,
                 R.dimen.movie_item_width, 0, layoutManager.getOrientation(), true);
@@ -89,39 +112,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
 
         mActivityMainBinding.rvMovieList.addItemDecoration(new GridItemSpacingDecoration(gridItemsSpanSpacing));
 
-        initializeMovieLoader(moviesAdapter);
-    }
-
-    /**
-     * Check is the movies filter was opened in the Application's previous state
-     *
-     * @param savedInstanceState the instance {@link Bundle}
-     */
-    private void checkForFilterOpenState(Bundle savedInstanceState) {
-        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_FILTER_SETTING_STATE)) {
-            movieFilterSettingActive = savedInstanceState.getBoolean(BUNDLE_FILTER_SETTING_STATE);
-            if (movieFilterSettingActive) {
-                movieFilterSettingActive = false; // to allow the settings open since we are toggling the setting
-                toggleMovieFilterSetting();
+        initializeViewModel();
+        mActivityMainBinding.actionReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mMoviesViewModel.reLoad();
             }
-        }
-    }
-
-    /**
-     * Check is there is {@link MoviesRecord} from the Application's previous state
-     *
-     * @param savedInstanceState the saved instance {@link Bundle}
-     */
-    private void checkForSavedMoviesInstance(Bundle savedInstanceState) {
-        if (savedInstanceState != null && savedInstanceState.containsKey(BUNDLE_MOVIE_RECORD)) {
-            mMoviesRecord = savedInstanceState.getParcelable(BUNDLE_MOVIE_RECORD);
-        }
-
-        if (mMoviesRecord != null) {
-            updateTitle(mMoviesRecord.getMovieDbFilter());
-        } else {
-            mMoviesRecord = new MoviesRecord();
-        }
+        });
     }
 
     private void updateTitle(CharSequence title) {
@@ -129,14 +126,6 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
                 .toUpperCase().replace("_", " "));
     }
 
-    @Override
-    public void onBackPressed() {
-        if (movieFilterSettingActive) {
-            toggleMovieFilterSetting();
-            return;
-        }
-        super.onBackPressed();
-    }
 
     /**
      * Show or hide the setting to filter movies
@@ -147,12 +136,12 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         FragmentManager fm = getSupportFragmentManager();
         SettingsFragment settingsFragment = (SettingsFragment) fm.findFragmentById(fragmentId);
         if (settingsFragment == null) {
-            mSettingsFragmentComitId =
+            mSettingsFragmentCommitId =
                     fm.beginTransaction()
                             .replace(fragmentId, SettingsFragment.create())
                             .addToBackStack(null).commit();
         } else {
-            fm.popBackStack(mSettingsFragmentComitId, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            fm.popBackStack(mSettingsFragmentCommitId, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
     }
 
@@ -176,9 +165,9 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         mEndlessRecyclerOnScrollListener = new EndlessRecyclerOnScrollListener() {
             @Override
             public void onLoadMore() {
-                Log.d("Loading more called", "status is " + String.valueOf(mMoviesLoading));
                 if (!mMoviesLoading) {
-                    loadMovies(mMoviesRecord.getCurrentPage() + 1, mMoviesRecord.getMovieDbFilter());
+                    MoviesRecord moviesRecord = mMoviesAdapter.getMoviesRecord();
+                    loadMovies(moviesRecord.getCurrentPage() + 1, moviesRecord.getMovieDbFilter());
                 }
             }
         };
@@ -200,46 +189,15 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
      * @param filter {{String}} filter for the movies to load
      */
     private void loadMovies(int page, String filter) {
-        if (filter == null || filter.isEmpty()) {
+        if (filter == null || TextUtils.isEmpty(filter)) {
+
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
             filter = sharedPreferences.getString(getString(R.string.pref_filter_key), getString(R.string.pref_filter_default));
-            updateTitle(filter);
 
         }
-        mMoviesLoader.load(page, filter);
-    }
-
-    /**
-     * Initialize the movie loader
-     *
-     * @param moviesAdapter a {@link MoviesAdapter} instance
-     */
-    private void initializeMovieLoader(final MoviesAdapter moviesAdapter) {
-        mMoviesLoader = new MoviesLoader(this, getSupportLoaderManager(), new MoviesLoader.MovieLoaderCallback() {
-            @Override
-            public void loadingMovies() {
-                mMoviesLoading = true;
-                mActivityMainBinding.pbLoading.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onLoadFinished(MoviesResult moviesResult) {
-                mMoviesRecord.addMovies(moviesResult);
-                if (!moviesResult.getResults().isEmpty()) {
-                    moviesAdapter.notifyDataSetChanged();
-                }
-                mMoviesLoading = false;
-
-                mActivityMainBinding.pbLoading.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onError(String errorMessage) {
-                mMoviesLoading = false;
-                mActivityMainBinding.pbLoading.setVisibility(View.GONE);
-                showMessage(errorMessage);
-            }
-        });
+        updateTitle(filter);
+        mMoviesViewModel.loadMovies(filter, page);
     }
 
     @Override
@@ -277,43 +235,13 @@ public class MainActivity extends AppCompatActivity implements SharedPreferences
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (movieFilterSettingActive) {
-            //noinspection ConstantConditions
-            outState.putBoolean(BUNDLE_FILTER_SETTING_STATE, movieFilterSettingActive);
-        }
-        if (!mMoviesRecord.isEmpty()) {
-            outState.putParcelable(BUNDLE_MOVIE_RECORD, mMoviesRecord);
-        } else {
-            // try to remove movie if any already save since we have an empty one
-            outState.remove(BUNDLE_MOVIE_RECORD);
-        }
-
-    }
 
     @Override
     public void onItemClick(Movie movie) {
         Bundle bundle = new Bundle();
         bundle.putParcelable(Config.EXTRA_MOVIE_KEY, movie);
         ActivityUtil.lunchActivityWithTransition(this, DetailsActivity.class, bundle);
-        // Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
-        //intent.putExtra(Config.EXTRA_MOVIE_KEY, movie);
-        // startActivity(intent);
     }
 
-    /**
-     * Shows a message about the application status, in the event of error
-     *
-     * @param message the message {@link String} to display
-     */
-    private void showMessage(String message) {
-        if (mToast != null) {
-            mToast.cancel();
-        }
-        mToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
-        mToast.show();
-    }
 }
 

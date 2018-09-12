@@ -1,14 +1,12 @@
 package com.naijaplanet.magosla.android.moviesplanet.fragments;
 
 import android.content.Intent;
-import android.databinding.ViewDataBinding;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ShareCompat;
-import android.support.v4.content.MimeTypeFilter;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,8 +24,7 @@ import com.naijaplanet.magosla.android.moviesplanet.loaders.VideosLoader;
 import com.naijaplanet.magosla.android.moviesplanet.models.Video;
 import com.naijaplanet.magosla.android.moviesplanet.util.MovieDbUtil;
 
-import java.util.List;
-
+@SuppressWarnings("ConstantConditions")
 public class VideosFragment extends Fragment implements VideosAdapter.OnEventListener {
 
 
@@ -46,16 +43,17 @@ public class VideosFragment extends Fragment implements VideosAdapter.OnEventLis
         return f;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
         Bundle arg = getArguments();
-        mMovieId = arg.getInt(BUNDLE_MOVIE_ID, 0);
+        mMovieId = arg!=null? arg.getInt(BUNDLE_MOVIE_ID, 0):0;
 
         mVideosAdapter = new VideosAdapter(getContext(), this);
 
-        mVideosLoader = new VideosLoader(getContext(), getActivity().getSupportLoaderManager(), new AppLoader.LoaderCallback<VideosResult>() {
+        mVideosLoader = new VideosLoader(getContext(), getActivity().getSupportLoaderManager(), new AppLoader.AppLoaderCallback<VideosResult>() {
 
             @Override
             public void loadingItems() {
